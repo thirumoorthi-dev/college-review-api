@@ -1,0 +1,340 @@
+{
+  "info": {
+    "_postman_id": "c1f7b8e1-9f23-4e89-a5c2-b5b6cf711d99",
+    "name": "College Review System API",
+    "description": "Comprehensive Postman collection for the College Review System REST API with RBAC, MongoDB Aggregations, and CRUD operations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "collegeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reviewId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Priya Dharshini\",\n  \"email\": \"priya.dharshini@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"student\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@college.edu\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@college.edu\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Colleges",
+      "item": [
+        {
+          "name": "Get Colleges (Aggregated Ratings & Count)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/colleges?page=1&limit=10&sort=rating_desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["colleges"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sort", "value": "rating_desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Colleges by Keyword or City",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/colleges?search=Technology&city=Chennai",
+              "host": ["{{baseUrl}}"],
+              "path": ["colleges"],
+              "query": [
+                { "key": "search", "value": "Technology" },
+                { "key": "city", "value": "Chennai" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get College by ID with Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/colleges/{{collegeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["colleges", "{{collegeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create College (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"PSG College of Technology\",\n  \"location\": \"Avinashi Road, Peelamedu\",\n  \"city\": \"Coimbatore\",\n  \"state\": \"Tamil Nadu\",\n  \"description\": \"Autonomous engineering college renowned for industry-institute collaboration and excellent placements.\",\n  \"website\": \"https://www.psgtech.edu\",\n  \"establishedYear\": 1951\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/colleges",
+              "host": ["{{baseUrl}}"],
+              "path": ["colleges"]
+            }
+          }
+        },
+        {
+          "name": "Update College (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated description with latest research rankings.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/colleges/{{collegeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["colleges", "{{collegeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete College (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/colleges/{{collegeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["colleges", "{{collegeId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get College Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/colleges/{{collegeId}}/reviews?page=1&limit=10&sort=newest",
+              "host": ["{{baseUrl}}"],
+              "path": ["colleges", "{{collegeId}}", "reviews"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sort", "value": "newest" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Review for College",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"title\": \"Phenomenal faculty and research ecosystem\",\n  \"comment\": \"Exceptional hands-on learning, strong peer group, and plenty of campus activities.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/colleges/{{collegeId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["colleges", "{{collegeId}}", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get Review by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "{{reviewId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Review (Owner or Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Updated review comment reflecting senior year experience.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "{{reviewId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Review (Owner or Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "{{reviewId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
