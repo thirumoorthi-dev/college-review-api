@@ -57,6 +57,35 @@ describe('Auth Integration Tests', () => {
       expect(res.statusCode).toBe(400);
       expect(res.body.success).toBe(false);
     });
+
+    it('should reject registration attempt with admin role to prevent privilege escalation', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send({
+          name: 'Malicious User',
+          email: 'adminattempt@test.com',
+          password: 'Password123!',
+          role: 'admin',
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.success).toBe(false);
+    });
+
+    it('should allow registration as teacher', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send({
+          name: 'Professor Test',
+          email: 'prof@test.com',
+          password: 'Password123!',
+          role: 'teacher',
+        });
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.user.role).toBe('teacher');
+    });
   });
 
   describe('POST /api/v1/auth/login', () => {

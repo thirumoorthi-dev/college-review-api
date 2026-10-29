@@ -172,8 +172,9 @@ const deleteReview = asyncHandler(async (req, res, next) => {
 
   const isOwner = review.user.toString() === req.user._id.toString();
   const isAdmin = req.user.role === 'admin';
+  const isTeacher = req.user.role === 'teacher';
 
-  if (!isOwner && !isAdmin) {
+  if (!isOwner && !isAdmin && !isTeacher) {
     return next(new AppError('You are not authorized to delete this review', 403));
   }
 

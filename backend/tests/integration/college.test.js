@@ -7,8 +7,10 @@ const Review = require('../../src/models/Review');
 describe('College Integration Tests', () => {
   let adminToken;
   let studentToken;
+  let teacherToken;
   let adminUser;
   let studentUser;
+  let teacherUser;
 
   beforeEach(async () => {
     adminUser = await User.create({
@@ -26,6 +28,14 @@ describe('College Integration Tests', () => {
       role: 'student',
     });
     studentToken = studentUser.generateAuthToken();
+
+    teacherUser = await User.create({
+      name: 'Teacher Test',
+      email: 'teachertest@test.com',
+      password: 'Password123!',
+      role: 'teacher',
+    });
+    teacherToken = teacherUser.generateAuthToken();
   });
 
   describe('POST /api/v1/colleges', () => {
@@ -55,6 +65,21 @@ describe('College Integration Tests', () => {
         .set('Authorization', `Bearer ${studentToken}`)
         .send({
           name: 'Student College',
+          location: 'Test Location',
+          city: 'Test City',
+          description: 'Test Description that is long enough.',
+        });
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.success).toBe(false);
+    });
+
+    it('should forbid teacher from creating a college (admin only)', async () => {
+      const res = await request(app)
+        .post('/api/v1/colleges')
+        .set('Authorization', `Bearer ${teacherToken}`)
+        .send({
+          name: 'Teacher College Attempt',
           location: 'Test Location',
           city: 'Test City',
           description: 'Test Description that is long enough.',
@@ -199,6 +224,57 @@ describe('College Integration Tests', () => {
 
       const findRes = await College.findById(college._id);
       expect(findRes).toBeNull();
+    });
+
+    it('should allow teacher to update college details', async () => {
+      const college = await College.create({
+        name: 'Teacher Updatable College',
+        location: 'Campus Road',
+        city: 'Chennai',
+        description: 'Original description.',
+      });
+
+      const res = await request(app)
+        .put(`/api/v1/colleges/${college._id}`)
+        .set('Authorization', `Bearer ${teacherToken}`)
+        .send({ description: 'Updated description by teacher faculty.' });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.college.description).toBe('Updated description by teacher faculty.');
+    });
+
+    it('should forbid teacher from deleting a college (admin only)', async () => {
+      const college = await College.create({
+        name: 'No Delete For Teacher',
+        location: 'Campus Road',
+        city: 'Chennai',
+        description: 'Description.',
+      });
+
+      const res = await request(app)
+        .delete(`/api/v1/colleges/${college._id}`)
+        .set('Authorization', `Bearer ${teacherToken}`);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.success).toBe(false);
+    });
+
+    it('should forbid student from updating a college', async () => {
+      const college = await College.create({
+        name: 'No Update For Student',
+        location: 'Campus Road',
+        city: 'Chennai',
+        description: 'Description.',
+      });
+
+      const res = await request(app)
+        .put(`/api/v1/colleges/${college._id}`)
+        .set('Authorization', `Bearer ${studentToken}`)
+        .send({ description: 'Unauthorized update.' });
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.success).toBe(false);
     });
   });
 });

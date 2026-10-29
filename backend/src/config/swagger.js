@@ -101,7 +101,7 @@ const swaggerOptions = {
                     name: { type: 'string', example: 'Priya Dharshini' },
                     email: { type: 'string', example: 'priya@college.edu' },
                     password: { type: 'string', example: 'Password123!' },
-                    role: { type: 'string', enum: ['student', 'teacher', 'admin'], default: 'student' },
+                    role: { type: 'string', enum: ['student', 'teacher'], default: 'student' },
                   },
                 },
               },

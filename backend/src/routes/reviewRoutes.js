@@ -20,7 +20,7 @@ router
   .route('/')
   .post(
     protect,
-    authorize('student', 'teacher', 'admin'),
+    authorize('student', 'teacher'),
     validate(createReviewSchema),
     createReview
   )
@@ -29,7 +29,12 @@ router
 router
   .route('/:id')
   .get(getReviewById)
-  .put(protect, validate(updateReviewSchema), updateReview)
-  .delete(protect, deleteReview);
+  .put(
+    protect,
+    authorize('student', 'teacher', 'admin'),
+    validate(updateReviewSchema),
+    updateReview
+  )
+  .delete(protect, authorize('student', 'teacher', 'admin'), deleteReview);
 
 module.exports = router;

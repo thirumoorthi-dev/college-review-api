@@ -8,6 +8,7 @@ describe('Review Integration Tests', () => {
   let student1Token;
   let student2Token;
   let adminToken;
+  let teacherToken;
   let student1;
   let student2;
   let testCollege;
@@ -28,6 +29,14 @@ describe('Review Integration Tests', () => {
       role: 'student',
     });
     student2Token = student2.generateAuthToken();
+
+    const teacher = await User.create({
+      name: 'Teacher User',
+      email: 'teacher@test.com',
+      password: 'Password123!',
+      role: 'teacher',
+    });
+    teacherToken = teacher.generateAuthToken();
 
     const admin = await User.create({
       name: 'Admin User',
@@ -215,6 +224,26 @@ describe('Review Integration Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(res.statusCode).toBe(200);
+    });
+
+    it('should allow teacher to moderate and delete any review', async () => {
+      const res = await request(app)
+        .delete(`/api/v1/reviews/${review._id}`)
+        .set('Authorization', `Bearer ${teacherToken}`);
+
+      expect(res.statusCode).toBe(200);
+
+      const findRes = await Review.findById(review._id);
+      expect(findRes).toBeNull();
+    });
+
+    it('should forbid student from deleting another user review', async () => {
+      const res = await request(app)
+        .delete(`/api/v1/reviews/${review._id}`)
+        .set('Authorization', `Bearer ${student2Token}`);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.success).toBe(false);
     });
   });
 });

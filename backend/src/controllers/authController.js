@@ -6,6 +6,10 @@ const sendResponse = require('../utils/apiResponse');
 const register = asyncHandler(async (req, res, next) => {
   const { name, email, password, role } = req.body;
 
+  if (role === 'admin') {
+    return next(new AppError('Administrator registration is prohibited', 403));
+  }
+
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return next(new AppError('An account with this email address already exists', 409));

@@ -27,7 +27,7 @@ router
 router
   .route('/:id')
   .get(getCollegeById)
-  .put(protect, authorize('admin'), validate(updateCollegeSchema), updateCollege)
+  .put(protect, authorize('admin', 'teacher'), validate(updateCollegeSchema), updateCollege)
   .delete(protect, authorize('admin'), deleteCollege);
 
 module.exports = router;

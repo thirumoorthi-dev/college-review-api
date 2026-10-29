@@ -14,7 +14,7 @@ const registerSchema = Joi.object({
     'string.empty': 'Password is required',
     'string.min': 'Password must be at least 6 characters',
   }),
-  role: Joi.string().valid('student', 'teacher', 'admin').default('student'),
+  role: Joi.string().valid('student', 'teacher').default('student'),
 });
 
 const loginSchema = Joi.object({
